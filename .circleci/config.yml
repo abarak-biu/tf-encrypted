@@ -52,6 +52,14 @@ jobs:
           name: build docker container
           command: make docker
 
+  build-macos:
+    macos:
+        xcode: "10.0"
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - *bootstrap
+
   deploy:
     docker:
       - image: circleci/python:3.5
@@ -74,6 +82,10 @@ workflows:
               # In order for the 'deploy' job to run, we must first kick off
               # the build job on all tags. By default, Circle CI only kicks off
               # builds on tags if a filter is defined.
+              only: /^(?:[0-9]+)\.(?:[0-9]+)\.(?:[0-9]+)(?:(\-rc[0-9]+)?)$/
+      - build-macos:
+          filters:
+            tags:
               only: /^(?:[0-9]+)\.(?:[0-9]+)\.(?:[0-9]+)(?:(\-rc[0-9]+)?)$/
       - deploy:
           requires:
